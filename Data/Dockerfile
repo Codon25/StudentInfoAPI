@@ -9,6 +9,7 @@ RUN dotnet restore "StudentNeonApi.csproj"
 COPY . .
 RUN dotnet publish "StudentNeonApi.csproj" -c Release -o /app/publish --no-restore
 
+
 # Runtime
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
