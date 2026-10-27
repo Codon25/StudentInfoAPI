@@ -16,6 +16,7 @@ namespace StudentAPI.Controllers
             db = context;
         }
 
+        // STANDARD RESPONSE
         private IActionResult Success<T>(T data)
         {
             object? responseData = data switch
@@ -42,11 +43,11 @@ namespace StudentAPI.Controllers
                 firstname = student.Firstname,
                 middlename = student.Middlename,
 
-                acadlevel_id = student.AcadlevelId ?? 1,
-                acadlevel_name = student.AcadlevelName ?? "No Levels",
+                acadlevel_id = student.Acadlevel_Id ?? 1,
+                acadlevel_name = student.Acadlevel_Name ?? "No Levels",
 
-                section_id = student.SectionId ?? 1,
-                section_name = student.SectionName ?? "No Section",
+                section_id = student.Section_Id ?? 1,
+                section_name = student.Section_Name ?? "No Section",
 
                 gender = student.Gender,
                 email = student.Email
@@ -84,6 +85,7 @@ namespace StudentAPI.Controllers
             return null;
         }
 
+        // STUDENT QUERY WITH JOINED DATA
         private IQueryable<StudentRow> StudentRows()
         {
             return
@@ -104,22 +106,25 @@ namespace StudentAPI.Controllers
                     Firstname = s.Firstname,
                     Middlename = s.Middlename,
 
-                    AcadlevelId = s.AcadlevelId,
-                    AcadlevelName = a == null ? null : a.Name,
+                    Acadlevel_Id = s.AcadlevelId,
+                    Acadlevel_Name = a == null ? null : a.Name,
 
-                    SectionId = s.SectionId,
-                    SectionName = t == null ? null : t.Name,
+                    Section_Id = s.SectionId,
+                    Section_Name = t == null ? null : t.Name,
 
                     Gender = s.Gender,
                     Email = s.Email
                 };
         }
 
+        // GET: STUDENTS, SEARCH, DROPDOWN DATA
         [HttpGet]
         public async Task<IActionResult> Get(
             [FromQuery] int? id,
             [FromQuery] string? search)
         {
+            // GET ALL STUDENTS
+            // ?get-all-students
             if (Request.Query.ContainsKey("get-all-students"))
             {
                 var students = await StudentRows()
@@ -129,6 +134,8 @@ namespace StudentAPI.Controllers
                 return Success(students);
             }
 
+            // GET ALL ACADEMIC LEVELS
+            // ?get-all-acadlevel
             if (Request.Query.ContainsKey("get-all-acadlevel"))
             {
                 var levels = await db.AcadLevels
@@ -139,6 +146,8 @@ namespace StudentAPI.Controllers
                 return Success(levels);
             }
 
+            // GET ALL SECTIONS
+            // ?get-all-sections
             if (Request.Query.ContainsKey("get-all-sections"))
             {
                 var sections = await db.Sections
@@ -149,6 +158,8 @@ namespace StudentAPI.Controllers
                 return Success(sections);
             }
 
+            // GET STUDENT BY ID
+            // ?id=1
             if (id.HasValue)
             {
                 var student = await StudentRows()
@@ -160,6 +171,8 @@ namespace StudentAPI.Controllers
                 return Success(student);
             }
 
+            // SEARCH STUDENTS
+            // ?search=John
             if (Request.Query.ContainsKey("search"))
             {
                 if (string.IsNullOrWhiteSpace(search))
@@ -187,6 +200,7 @@ namespace StudentAPI.Controllers
             return Error("Invalid GET request.");
         }
 
+        // POST: ADD STUDENT
         [HttpPost]
         public async Task<IActionResult> Add(
             [FromBody] Student student)
@@ -209,6 +223,7 @@ namespace StudentAPI.Controllers
             return Success(createdStudent);
         }
 
+        // PUT: UPDATE STUDENT
         [HttpPut]
         public async Task<IActionResult> Update(
             [FromBody] Student input)
@@ -222,6 +237,7 @@ namespace StudentAPI.Controllers
             if (student == null)
                 return Error("Student not found.", 404);
 
+            // Preserve existing links when the request omits their IDs.
             var acadlevelId = input.AcadlevelId ?? student.AcadlevelId;
             var sectionId = input.SectionId ?? student.SectionId;
 
@@ -247,6 +263,7 @@ namespace StudentAPI.Controllers
             return Success(updatedStudent);
         }
 
+        // DELETE: DELETE STUDENT
         [HttpDelete]
         public async Task<IActionResult> Delete(
             [FromBody] DeleteStudentRequest input)
@@ -271,6 +288,7 @@ namespace StudentAPI.Controllers
         }
     }
 
+    // DELETE REQUEST MODEL
     public class DeleteStudentRequest
     {
         public int Id { get; set; }
