@@ -21,10 +21,6 @@ WORKDIR /app
 
 COPY --from=build /app/publish .
 
-# Render HTTP port
-ENV ASPNETCORE_URLS=http://0.0.0.0:10000
-
 EXPOSE 10000
 
-# Start ASP.NET Core API
-ENTRYPOINT ["dotnet", "StudentAPI.dll"]
+ENTRYPOINT ["sh", "-c", "exec dotnet StudentAPI.dll --urls http://0.0.0.0:${PORT:-10000}"]
