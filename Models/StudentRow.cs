@@ -1,5 +1,5 @@
-
 namespace StudentAPI.Models;
+
 public class StudentRow
 {
     public int Id { get; set; }
@@ -8,6 +8,7 @@ public class StudentRow
     public string? Middlename { get; set; }
     public int? AcadlevelId { get; set; }
     public string? AcadlevelName { get; set; }
+
     public int? SectionId { get; set; }
     public string? SectionName { get; set; }
     public string Gender { get; set; } = "";
