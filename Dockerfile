@@ -1,3 +1,8 @@
+
+# ==============================
+# BUILD STAGE
+# ==============================
+
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 
 WORKDIR /src
@@ -15,12 +20,20 @@ COPY . .
 RUN dotnet publish "StudentAPI.csproj" -c Release -o /app/publish --no-restore
 
 
+# ==============================
+# RUNTIME STAGE
+# ==============================
+
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 
 WORKDIR /app
 
 COPY --from=build /app/publish .
 
+# Render HTTP port
+ENV ASPNETCORE_URLS=http://0.0.0.0:10000
+
 EXPOSE 10000
 
-ENTRYPOINT ["sh", "-c", "exec dotnet StudentAPI.dll --urls http://0.0.0.0:${PORT:-10000}"]
+# Start ASP.NET Core API
+ENTRYPOINT ["dotnet", "StudentAPI.dll"]
